@@ -1,0 +1,13 @@
+name: C course
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        cc: [gcc, clang]
+    steps:
+      - uses: actions/checkout@v4
+      - run: make build/student reference CC=${{ matrix.cc }} CFLAGS="-O1 -g -fsanitize=address,undefined -fno-omit-frame-pointer"
