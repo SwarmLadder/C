@@ -37,5 +37,9 @@ build/mastery-reference: $(MASTER_SOLUTIONS) mastery/include/mastery.h tests/mas
 	@mkdir -p build
 	$(CC) $(MASTER_FLAGS) $(CFLAGS) $(MASTER_SOLUTIONS) tests/mastery.c -o $@
 
+build/telemetry-inspector: examples/telemetry_reader/main.c mastery/reference/frame_header.c mastery/include/mastery.h Makefile
+	@mkdir -p build
+	$(CC) $(MASTER_FLAGS) $(CFLAGS) examples/telemetry_reader/main.c mastery/reference/frame_header.c -o $@
+
 clean:
 	rm -rf build
