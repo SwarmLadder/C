@@ -43,3 +43,18 @@ build/telemetry-inspector: examples/telemetry_reader/main.c mastery/reference/fr
 
 clean:
 	rm -rf build
+
+.PHONY: array-pointer-reference array-pointer-practice
+array-pointer-reference: build/array-pointer-reference
+	./build/array-pointer-reference
+
+array-pointer-practice: build/array-pointer-practice
+	./build/array-pointer-practice
+
+build/array-pointer-reference: examples/array_pointer_lab/reference.c examples/array_pointer_lab/test.c Makefile
+	@mkdir -p build
+	$(CC) $(FLAGS) $(CFLAGS) examples/array_pointer_lab/reference.c examples/array_pointer_lab/test.c -o $@
+
+build/array-pointer-practice: examples/array_pointer_lab/starter.c examples/array_pointer_lab/test.c Makefile
+	@mkdir -p build
+	$(CC) $(FLAGS) $(CFLAGS) examples/array_pointer_lab/starter.c examples/array_pointer_lab/test.c -o $@
