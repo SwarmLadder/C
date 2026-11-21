@@ -116,6 +116,138 @@ static void check_topology(void) {
     CHECK(output[0] == 0 && output[1] == 1 && output[2] == 2);
 }
 
+
+static void check_reverse_span(void) {
+    uint8_t bytes[] = {0, 255, 2, 3, 4};
+    CHECK(reverse_span(NULL, 0));
+    CHECK(!reverse_span(NULL, 1));
+    CHECK(reverse_span(bytes, 0) && bytes[0] == 0);
+    CHECK(reverse_span(bytes, 5));
+    CHECK(bytes[0] == 4 && bytes[1] == 3 && bytes[2] == 2 &&
+          bytes[3] == 255 && bytes[4] == 0);
+    CHECK(reverse_span(bytes, 5));
+    CHECK(bytes[0] == 0 && bytes[1] == 255 && bytes[4] == 4);
+    CHECK(reverse_span(bytes, 1) && bytes[0] == 0);
+    CHECK(reverse_span(bytes, 2) && bytes[0] == 255 && bytes[1] == 0);
+}
+
+static void check_parse_hex(void) {
+    uint32_t value = 88;
+    CHECK(parse_u32_hex("0", &value) && value == 0);
+    CHECK(parse_u32_hex("Ff", &value) && value == UINT32_C(255));
+    CHECK(parse_u32_hex("0000ABCD", &value) && value == UINT32_C(43981));
+    CHECK(parse_u32_hex("ffffffff", &value) && value == UINT32_MAX);
+    CHECK(!parse_u32_hex("100000000", &value) && value == UINT32_MAX);
+    CHECK(!parse_u32_hex("000000000", &value) && value == UINT32_MAX);
+    CHECK(!parse_u32_hex("0xFF", &value) && value == UINT32_MAX);
+    CHECK(!parse_u32_hex(" G", &value) && value == UINT32_MAX);
+    CHECK(!parse_u32_hex("", &value) && value == UINT32_MAX);
+    CHECK(!parse_u32_hex(NULL, &value) && value == UINT32_MAX);
+    CHECK(!parse_u32_hex("123", NULL));
+    CHECK(parse_u32_hex("deadBEEF", &value) && value == UINT32_C(3735928559));
+}
+
+static void check_lower_bound(void) {
+    size_t out = 99;
+    int32_t values[] = {-7, -1, -1, 0, 3, 3, INT32_MAX};
+    CHECK(lower_bound_i32(values, 7, INT32_MIN, &out) && out == 0);
+    CHECK(lower_bound_i32(values, 7, -1, &out) && out == 1);
+    CHECK(lower_bound_i32(values, 7, 2, &out) && out == 4);
+    CHECK(lower_bound_i32(values, 7, 3, &out) && out == 4);
+    CHECK(lower_bound_i32(values, 7, INT32_MAX, &out) && out == 6);
+    CHECK(lower_bound_i32(NULL, 0, 4, &out) && out == 0);
+    CHECK(!lower_bound_i32(NULL, 1, 4, &out) && out == 0);
+    CHECK(!lower_bound_i32(values, 7, 3, NULL));
+    int32_t equal[] = {9, 9, 9, 9};
+    CHECK(lower_bound_i32(equal, 4, 10, &out) && out == 4);
+    CHECK(lower_bound_i32(equal, 4, 9, &out) && out == 0);
+}
+
+static void check_unique_sorted(void) {
+    int32_t items[] = {-4, -4, -1, 0, 0, 0, 5, 5};
+    size_t count = 77;
+    CHECK(unique_sorted_i32(items, 8, &count) && count == 4);
+    CHECK(items[0] == -4 && items[1] == -1 && items[2] == 0 && items[3] == 5);
+    CHECK(unique_sorted_i32(items, count, &count) && count == 4);
+    CHECK(unique_sorted_i32(NULL, 0, &count) && count == 0);
+    CHECK(!unique_sorted_i32(NULL, 1, &count) && count == 0);
+    CHECK(!unique_sorted_i32(items, 1, NULL));
+    int32_t invalid[] = {0, 5, 3, 9};
+    count = 42;
+    CHECK(!unique_sorted_i32(invalid, 4, &count));
+    CHECK(count == 42 && invalid[0] == 0 && invalid[1] == 5 &&
+          invalid[2] == 3 && invalid[3] == 9);
+    int32_t single[] = {INT32_MIN};
+    CHECK(unique_sorted_i32(single, 1, &count) && count == 1);
+}
+
+static void check_ring_queue(void) {
+    RingQueue q = {{0}, 0, 0};
+    uint32_t out = 777;
+    ring_reset(&q);
+    CHECK(!ring_pop(&q, &out) && out == 777);
+    for (uint32_t i = 0; i < 8; ++i)
+        CHECK(ring_push(&q, i * UINT32_C(10)));
+    CHECK(q.size == 8 && !ring_push(&q, 90) && q.size == 8);
+    for (uint32_t i = 0; i < 3; ++i) {
+        CHECK(ring_pop(&q, &out) && out == i * UINT32_C(10));
+    }
+    CHECK(q.head == 3 && q.size == 5);
+    for (uint32_t i = 8; i < 11; ++i)
+        CHECK(ring_push(&q, i * UINT32_C(10)));
+    for (uint32_t i = 3; i < 11; ++i)
+        CHECK(ring_pop(&q, &out) && out == i * UINT32_C(10));
+    CHECK(q.size == 0 && !ring_pop(&q, &out) && out == 100);
+    CHECK(!ring_pop(NULL, &out));
+    CHECK(!ring_pop(&q, NULL));
+    CHECK(!ring_push(NULL, 5));
+    q.head = 8;
+    CHECK(!ring_push(&q, 7) && !ring_pop(&q, &out));
+    ring_reset(&q);
+    CHECK(q.size == 0 && q.head == 0);
+    ring_reset(NULL);
+    CHECK(ring_push(&q, UINT32_MAX));
+    CHECK(ring_pop(&q, &out) && out == UINT32_MAX);
+}
+
+static void check_dag_distances(void) {
+    const Edge graph[] = {{0, 1}, {0, 2}, {1, 3}, {2, 3}, {3, 4}};
+    const uint32_t weights[] = {4, 2, 1, 7, 3};
+    int64_t dist[5] = {77, 77, 77, 77, 77};
+    CHECK(dag_distances(5, graph, weights, 5, 0, dist));
+    CHECK(dist[0] == 0 && dist[1] == 4 && dist[2] == 2 &&
+          dist[3] == 5 && dist[4] == 8);
+    CHECK(dag_distances(5, graph, weights, 5, 2, dist));
+    CHECK(dist[0] == -1 && dist[1] == -1 && dist[2] == 0 &&
+          dist[3] == 7 && dist[4] == 10);
+    const Edge cycle[] = {{0, 1}, {1, 0}};
+    const uint32_t cycweight[] = {1, 2};
+    int64_t unchanged[] = {44, 55};
+    CHECK(!dag_distances(2, cycle, cycweight, 2, 0, unchanged));
+    CHECK(unchanged[0] == 44 && unchanged[1] == 55);
+    CHECK(!dag_distances(0, NULL, NULL, 0, 0, unchanged));
+    CHECK(!dag_distances(65, NULL, NULL, 0, 0, unchanged));
+    CHECK(!dag_distances(2, NULL, NULL, 0, 2, unchanged));
+    CHECK(!dag_distances(2, NULL, NULL, 0, 0, NULL));
+    CHECK(!dag_distances(2, graph, NULL, 1, 0, unchanged));
+    CHECK(unchanged[0] == 44 && unchanged[1] == 55);
+    CHECK(dag_distances(2, NULL, NULL, 0, 0, unchanged));
+    CHECK(unchanged[0] == 0 && unchanged[1] == -1);
+    const Edge huge[] = {{0, 1}, {1, 2}};
+    const uint32_t bigw[] = {UINT32_MAX, UINT32_MAX};
+    int64_t bigout[3] = {0};
+    CHECK(dag_distances(3, huge, bigw, 2, 0, bigout));
+    CHECK(bigout[2] == INT64_C(8589934590));
+    const Edge dup[] = {{0, 1}, {0, 1}, {1, 2}};
+    const uint32_t dupw[] = {10, 1, 2};
+    CHECK(dag_distances(3, dup, dupw, 3, 0, bigout));
+    CHECK(bigout[1] == 1 && bigout[2] == 3);
+    const Edge self[] = {{0, 0}};
+    const uint32_t selfw[] = {0};
+    int64_t flag = 9;
+    CHECK(!dag_distances(1, self, selfw, 1, 0, &flag) && flag == 9);
+}
+
 int main(int argc, char **argv) {
     struct Task { const char *name; const char *level; void (*test)(void); };
     const struct Task tasks[] = {
@@ -124,7 +256,13 @@ int main(int argc, char **argv) {
         {"text_buffer", "intermediate", check_buffer},
         {"byte_histogram", "intermediate", check_stream},
         {"frame_header", "advanced", check_frame},
-        {"topological", "advanced", check_topology}
+        {"topological", "advanced", check_topology},
+        {"reverse_span", "basics", check_reverse_span},
+        {"parse_hex", "basics", check_parse_hex},
+        {"lower_bound", "intermediate", check_lower_bound},
+        {"unique_sorted", "intermediate", check_unique_sorted},
+        {"ring_queue", "advanced", check_ring_queue},
+        {"dag_distances", "advanced", check_dag_distances}
     };
     size_t n = 0;
     for (size_t i = 0; i < sizeof tasks / sizeof tasks[0]; ++i) {
