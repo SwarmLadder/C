@@ -1,8 +1,9 @@
 CC ?= cc
 CFLAGS ?= -O2
 FLAGS = -std=c17 -Wall -Wextra -Werror -pedantic -Iinclude
-STARTERS := $(wildcard */starter/*.c)
-SOLUTIONS := $(wildcard */solutions/*.c)
+LEVELS := basics intermediate advanced
+STARTERS := $(foreach level,$(LEVELS),$(wildcard $(level)/starter/*.c))
+SOLUTIONS := $(foreach level,$(LEVELS),$(wildcard $(level)/solutions/*.c))
 MASTER_STARTERS := $(wildcard mastery/starter/*.c)
 MASTER_SOLUTIONS := $(wildcard mastery/reference/*.c)
 MASTER_FLAGS = -std=c17 -Wall -Wextra -Werror -pedantic -Imastery/include
