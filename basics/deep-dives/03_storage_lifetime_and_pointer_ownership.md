@@ -22,6 +22,7 @@ Instead either return a *value*, accept a caller-supplied buffer, or return allo
 
 ~~~c
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 
 char *make_copy(const char *text) {

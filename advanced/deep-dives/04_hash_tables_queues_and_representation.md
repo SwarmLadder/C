@@ -10,6 +10,41 @@ A dynamic array has O(1) index access and amortized O(1) append with geometric r
 
 Maintain head and len with 0<=len<=cap. For nonzero capacity, head is a valid buffer index. Push at (head+len)%cap only if len<cap; pop from head only if len>0. Guard cap==0 before the modulo operation. Because head+len could overflow size_t for extreme capacities, production code can compute the index using a conditional subtraction or establish a representable bound.
 
+## Worked code: bounded FIFO push and pop
+
+This implementation uses a fixed capacity of eight, rejects insertion when full, and preserves the output parameter when the queue is empty. Because both head and len are bounded by eight, their sum cannot overflow size_t.
+
+~~~c
+#include <stdbool.h>
+#include <stddef.h>
+
+typedef struct {
+    unsigned slots[8];
+    size_t head;
+    size_t len;
+} Ring8;
+
+bool ring8_push(Ring8 *q, unsigned item) {
+    if (q == NULL || q->len >= 8 || q->head >= 8)
+        return false;
+    size_t index = (q->head + q->len) % 8;
+    q->slots[index] = item;
+    ++q->len;
+    return true;
+}
+
+bool ring8_pop(Ring8 *q, unsigned *out) {
+    if (q == NULL || out == NULL || q->len == 0 || q->head >= 8)
+        return false;
+    *out = q->slots[q->head];
+    q->head = (q->head + 1) % 8;
+    --q->len;
+    return true;
+}
+~~~
+
+Start with {head=0,len=0}; pushing 8 items sets len=8, so a ninth push fails before modifying data. Three pops move head to 3 and reduce len to 5; three pushes wrap around to slots 0, 1 and 2. The queue's logical reading order is not the same as the physical order of the array. Test the invariant after every transition. In an API with arbitrary capacity rather than fixed eight, head+len may overflow and requires a different index calculation or a documented representable bound.
+
 A fixed-capacity ring should define what happens when full: reject, overwrite oldest, or block. These are different API contracts and should be tested separately.
 
 ## Hash collisions and tombstones
