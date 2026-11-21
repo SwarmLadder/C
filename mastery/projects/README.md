@@ -24,3 +24,6 @@ Every capstone submission needs a README stating scope, build commands, portabil
 Use the [assessment rubric](../../curriculum/ASSESSMENT.md). A passing demo is not sufficient without readable contracts, comprehensive failure checks and safe cleanup.
 
 **Safety:** Test only with files you control; programs that parse malicious files should run in a suitable isolated environment. None of these specifications asks for privileged operations or network exploitation.
+## Working reference to study after your own attempt
+
+The [portable binary telemetry CLI](../../examples/telemetry_reader/README.md) is a fully runnable, tested implementation of a limited version of the first capstone. It is offered as a **code-reading and debugging reference**, not an answer to copy before attempting the project. Its safe input validation, bounded payload reading, deterministic summaries and explicit failure semantics make a useful basis for code review. It intentionally omits many production concerns such as authentication and durability.

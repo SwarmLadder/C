@@ -21,6 +21,8 @@ jobs:
         run: make reference CC=${{ matrix.cc }} CFLAGS="-O1 -g -fsanitize=undefined -fno-omit-frame-pointer"
       - name: Validate twelve C mastery labs
         run: make mastery-reference CC=${{ matrix.cc }} CFLAGS="-O1 -g -fsanitize=undefined -fno-omit-frame-pointer"
+      - name: Compile portable reference telemetry CLI
+        run: make build/telemetry-inspector CC=${{ matrix.cc }} CFLAGS="-O1 -g -fsanitize=undefined -fno-omit-frame-pointer"
       - name: Validate course materials and links
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
       - name: Confirm unfinished exercises fail grading

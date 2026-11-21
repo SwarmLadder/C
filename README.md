@@ -72,3 +72,7 @@ A pointer paired with zero length may be null when no elements are accessed. Oth
 The expanded mastery track includes **12 fully tested lab contracts** in [mastery/README.md](mastery/README.md), with a separate unfinished starter and completed reference implementation for each. You can now practice in-place byte transformations, strict hex parsing, binary search, stable deduplication, circular queues, and DAG shortest paths in addition to the original six.
 
 Go beyond passing unit tests with the [C debugging clinic](curriculum/DEBUGGING_CLINIC.md) and [adversarial test matrix](curriculum/EDGE_CASE_MATRIX.md). These show common incorrect approaches, explain why they fail, and provide extra tests to implement independently. The teaching format emphasizes **correctness invariants, object lifetime, error preservation, time/space complexity, and professional code review**.
+
+## Worked reference project: real binary CLI
+
+The [portable telemetry inspector](examples/telemetry_reader/README.md) provides a **complete, executable ISO C17 reference** that reads a framed binary stream from stdin, validates it, rejects truncated data, and prints deterministic per-kind counters. It uses the existing C frame decoder but deliberately does not publish a partial summary on invalid input. Try `make build/telemetry-inspector` and inspect the eight black-box regression tests before implementing the capstone yourself.
