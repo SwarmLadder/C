@@ -20,7 +20,7 @@ An unfinished starter that passes only because assertions are disabled is not a 
 
 - **Foundation (at least 60/100, no critical gate):** All basics workshop checks and basics mastery labs, sound array/string contracts and a reproducible build.
 - **Independent C developer (at least 80/100, no critical gate):** Full intermediate checks, documented ownership, robust parsing, at least one project with adverse-input tests.
-- **Systems-capable C developer (at least 90/100, no critical gate):** All levels and six mastery labs; one integrated capstone, a failure-injection demo, a binary/stream format explanation, and a measured performance or complexity argument.
+- **Systems-capable C developer (at least 90/100, no critical gate):** All levels and twelve mastery labs; one integrated capstone, a failure-injection demo, a binary/stream format explanation, and a measured performance or complexity argument.
 
 Scores describe **demonstrated work**, not a hiring or certification guarantee. Safety failures always take precedence over an aggregate score.
 
@@ -48,3 +48,7 @@ For each major function, record: preconditions; postconditions; failure behavior
 **Mock C (75 min):** 15 minutes binary protocol design, 30 minutes multi-file parser implementation, 15 minutes fuzz/truncation reasoning, 15 minutes portability and performance review.
 
 In each mock, speak your invariant before typing and evaluate the result against the same score categories above.
+
+## Evidence required for the enriched mastery track
+
+For each of the **twelve** labs, retain a failed-input test, a normal-input test, a boundary test, and a short proof of the key invariant. Review the [edge-case matrix](EDGE_CASE_MATRIX.md) but write your own tests rather than copying the existing grader. Completing all twelve labs is **necessary but not sufficient** for the highest attainment level: a reviewed multi-file capstone and failure-path inspection remain required.

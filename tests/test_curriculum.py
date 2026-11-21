@@ -6,7 +6,9 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 LEVELS = ("basics", "intermediate", "advanced")
 LABS = ("checked_add", "parse_decimal", "text_buffer",
-        "byte_histogram", "frame_header", "topological")
+        "byte_histogram", "frame_header", "topological",
+        "reverse_span", "parse_hex", "lower_bound",
+        "unique_sorted", "ring_queue", "dag_distances")
 
 
 class CurriculumCompleteness(unittest.TestCase):
@@ -41,7 +43,7 @@ class CurriculumCompleteness(unittest.TestCase):
         self.assertTrue((ROOT / "mastery/include/mastery.h").exists())
         self.assertTrue((ROOT / "tests/mastery.c").exists())
         docs = sorted((ROOT / "mastery/tasks").glob("*.md"))
-        self.assertEqual(len(docs), 6)
+        self.assertEqual(len(docs), 12)
         for page in docs:
             text = page.read_text()
             self.assertGreater(len(text.split()), 200, page.name)

@@ -19,7 +19,7 @@ jobs:
         run: make build/student build/reference build/mastery-student build/mastery-reference CC=${{ matrix.cc }} CFLAGS="-O1 -g -fsanitize=undefined -fno-omit-frame-pointer"
       - name: Validate 81 existing C workshop/project reference functions
         run: make reference CC=${{ matrix.cc }} CFLAGS="-O1 -g -fsanitize=undefined -fno-omit-frame-pointer"
-      - name: Validate six new C mastery labs
+      - name: Validate twelve C mastery labs
         run: make mastery-reference CC=${{ matrix.cc }} CFLAGS="-O1 -g -fsanitize=undefined -fno-omit-frame-pointer"
       - name: Validate course materials and links
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
